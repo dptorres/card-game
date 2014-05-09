@@ -41,7 +41,7 @@ public class SplashScreen implements Screen {
 			
 			//draw background
 			splashBg.begin();
-			splashBg.draw(Variables.textureAtlasOthers.findRegion("background"), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			splashBg.draw(Variables.textureAtlasOthers.findRegion("background"), 0, 0, Variables.worldWidth, Variables.worldHeight);
 			splashBg.end();
 			
 			splashStage.draw();
