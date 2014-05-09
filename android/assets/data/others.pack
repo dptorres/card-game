@@ -1,0 +1,27 @@
+
+others.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 1, 68
+  size: 795, 530
+  orig: 795, 530
+  offset: 0, 0
+  index: -1
+blue_bubble
+  rotate: false
+  xy: 1, 1
+  size: 98, 65
+  split: 34, 27, 16, 20
+  orig: 98, 65
+  offset: 0, 0
+  index: -1
+coin
+  rotate: false
+  xy: 798, 540
+  size: 58, 58
+  orig: 58, 58
+  offset: 0, 0
+  index: -1
