@@ -4,14 +4,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Pool;
 
 public class Card extends Actor {
 	TextureRegion frontTexture, backTexture;
-	public boolean isSelected, isFront = false;
+	public boolean isFront = false;
 	String memberNumber;
 	String suit;
 	Sprite mySprite;
@@ -30,35 +26,8 @@ public class Card extends Actor {
 		setBounds(getX(), getY(), width, height);
 		
 		setName(filePath);
-		addClickListener();
 	}
 
-	//listener for userCard
-	private void addClickListener() {
-		final Pool<MoveToAction> actionPool = new Pool<MoveToAction>(){
-	        protected MoveToAction newObject(){
-	            return new MoveToAction();
-	        }
-	    };
-		
-		addListener(new ClickListener() {
-			public void clicked(InputEvent event, float x, float y) {
-				final MoveToAction move = actionPool.obtain();
-				if (isSelected) {
-					move.setPosition(getX(), getY() - 20);
-					isSelected = false;
-				} else {
-					move.setPosition(getX(), getY() + 20);
-					isSelected = true;
-				}
-	    	    
-	    	    move.setDuration(0.2f);
-	    	    addAction(move);
-	    	    actionPool.free(move);
-			}
-		});
-	}
-	
 	public String getMemberNumber() {
 		return memberNumber;
 	}
