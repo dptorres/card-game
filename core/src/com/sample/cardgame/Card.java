@@ -27,7 +27,7 @@ public class Card extends Actor {
 		
 		setName(filePath);
 	}
-
+	
 	public String getMemberNumber() {
 		return memberNumber;
 	}

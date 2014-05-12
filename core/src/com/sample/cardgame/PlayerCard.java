@@ -7,14 +7,19 @@ import com.badlogic.gdx.utils.Pool;
 
 public class PlayerCard extends Card {
 	public boolean isSelected;
+	public Card card;
 	
 	public PlayerCard(String filePath, String memberNumber, String suit) {
 		super(filePath, memberNumber, suit);
-		
 		addClickListener();
 		
 	}
 	
+	public PlayerCard(Card card) {
+		this(card.getName(), card.getMemberNumber(), card.getSuitNumber());
+
+	}
+
 	//listener for userCard
 	private void addClickListener() {
 		final Pool<MoveToAction> actionPool = new Pool<MoveToAction>(){

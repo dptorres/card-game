@@ -13,14 +13,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Pool;
 
 public class GameScreen implements Screen {
 	
@@ -31,6 +35,7 @@ public class GameScreen implements Screen {
 	BitmapFont font;
 	TextButtonStyle textStyle;
 	ArrayList<Card> deck, dumpedCards;
+	ArrayList<PlayerCard> playerCards;
 	Table rootTable;
 	float cardWidth, cardHeight;
 	
@@ -66,6 +71,9 @@ public class GameScreen implements Screen {
 	    //initialize deck
 	    initCardsInDeck();
 	    
+	    //create player cards
+	    getPlayerCardsFromDeck();
+	    
 	    //set up table
 	    setUpTableAndWidgets();
 	    
@@ -85,7 +93,7 @@ public class GameScreen implements Screen {
 		final Table avatarTableOne = createAvatarTable(1);
 		final Table avatarTableTwo = createAvatarTable(2);
 		final Table avatarTableThree = createAvatarTable(3);
-//		final Table playerCardTable = createPlayerCardTable();
+		final Table playerCardTable = createPlayerCardTable();
 		
 		//create jackpot image
 		Image jackpot = new Image(new Texture(Gdx.files.internal("data/jackpot.png")));
@@ -97,34 +105,34 @@ public class GameScreen implements Screen {
 		rootTable.add(avatarTableTwo).padTop(50).left();
 		rootTable.add().padTop(50).expandX().center();
 		rootTable.add(avatarTableThree).padTop(50).padRight(30).right().row();
-//		rootTable.add(playerCardTable).padTop(50).center().expandX();
+		rootTable.add(playerCardTable).expandX().expandY().bottom().left().padBottom(30);
 		rootTable.top();
 		
 		stage.addActor(rootTable);
 		
 	}
 
-//	private Table createPlayerCardTable() {
-//		final Table playerTable = new Table();
-//		
-//		//create MoveToAction pool
-//	    Pool<MoveToAction> actionPool = new Pool<MoveToAction>(){
-//	        protected MoveToAction newObject(){
-//	            return new MoveToAction();
-//	        }
-//	    };
-//	    
-//	    //add cards to stage
-//	    for (int i = 12, j = (Variables.worldWidth / 5); i > -1; i--, j += cardWidth - 20) {
-//	    	playerTable.addActor(playerCards.get(i));
-//	    	final MoveToAction move = actionPool.obtain();
-//    	    move.setPosition(j, Variables.worldHeight / 3);
-//    	    move.setDuration(2f);
-//    	    playerCards.get(i).addAction(move);
-//	    }
-//		
-//		return playerTable;
-//	}
+	private Table createPlayerCardTable() {
+		final Table playerTable = new Table();
+		
+		//create MoveToAction pool
+	    Pool<MoveToAction> actionPool = new Pool<MoveToAction>(){
+	        protected MoveToAction newObject(){
+	            return new MoveToAction();
+	        }
+	    };
+	    
+	    //add cards to stage
+	    for (int i = 12, j = (Variables.worldWidth / 5); i > -1; i--, j += cardWidth - 20) {
+	    	playerTable.addActor(playerCards.get(i));	
+	    	final MoveToAction move = actionPool.obtain();
+    	    move.setPosition(j, playerCards.get(i).getY());
+    	    move.setDuration(2f);
+    	    playerCards.get(i).addAction(move);
+	    }
+		
+		return playerTable;
+	}
 
 	private Table createAvatarTable(int playerNumber) {
 		final Table avatarTable = new Table();
@@ -133,7 +141,8 @@ public class GameScreen implements Screen {
 		final TextButton userName = new TextButton("User" + playerNumber + "\n P305", buttonStyle);
 		final Image avatar = new Image(new Texture(Gdx.files.internal("data/avatar.png")));
 		avatar.setScale(1.5f, 1.5f);
-		userName.setDisabled(true);
+		userName.addListener(createAvatarClickListener());
+		
 		if (playerNumber == 1) {
 			avatarTable.add(userName);
 			avatarTable.add(avatar);
@@ -144,6 +153,24 @@ public class GameScreen implements Screen {
 		}
 		
 		return avatarTable;
+	}
+
+	private EventListener createAvatarClickListener() {
+		return new ClickListener() {
+			public void clicked(InputEvent e, float x, float y) {
+				final MoveToAction move = new MoveToAction();
+			    final ScaleToAction scale = new ScaleToAction();
+			    
+			    move.setPosition(600f, 100f);
+			    move.setDuration(2f);
+			    scale.setScale(0.3f);
+			    scale.setDuration(2f);
+	    		Gdx.app.log("Log", "Clicked!");
+	    		deck.get(0).addAction(move);
+	    		deck.get(0).addAction(scale);
+	    		deck.remove(0);
+			}
+		};
 	}
 
 	private Table createDumpedCardTable() {
@@ -194,6 +221,18 @@ public class GameScreen implements Screen {
 		
 	}
 	
+	private void getPlayerCardsFromDeck() {
+		playerCards = new ArrayList<PlayerCard>();
+		
+		for (int i = 0; i < 13; i++) {
+			PlayerCard temp = new PlayerCard(deck.get(i));
+			temp.setIsFront(true);
+			playerCards.add(temp);
+			deck.remove(i);
+		}
+		
+	}
+	
 	private void initCardsInDeck() {
 		deck = new ArrayList<Card>();
 		dumpedCards = new ArrayList<Card>();
@@ -202,7 +241,6 @@ public class GameScreen implements Screen {
 			for (int j = 0; j < Variables.memberNumber.length; j++) {
 				String filename = Variables.suits[i] + "" + Variables.memberNumber[j];
 				Card temp = new Card(filename, Variables.memberNumber[j], Variables.suits[i]);
-				temp.setPosition(20, Variables.worldHeight / 3);
 				deck.add(temp);
 				
 			}
